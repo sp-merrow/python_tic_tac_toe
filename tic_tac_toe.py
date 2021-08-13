@@ -57,6 +57,7 @@ inactiveColor = (100, 100, 100)
 activeColor = (202, 202, 202)
 color = inactiveColor
 active = False
+hasQuit = False
 newClickZones()
 
 def hasWon(locations):
@@ -83,7 +84,7 @@ def getWinner():
     return None
 
 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
-while running:
+while running and not hasQuit:
     for event in pygame.event.get():
         if inputRect.collidepoint(pygame.mouse.get_pos()):
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
@@ -111,7 +112,7 @@ while running:
                     inputText = ''
                 inputText += event.unicode
         if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
-            pygame.quit()
+            hasQuit, running = True, False
 
     screen.fill((255, 255, 255))
     inputSurf = baseFont.render(inputText, True, (0, 0, 0))
@@ -139,7 +140,7 @@ exitButton.center = (screenWidth/2, 500)
 exitCoords = ( (exitButton.centerx - (exitText.get_rect().w/2)), (exitButton.centery - (exitText.get_rect().h/2)) )
 buttonsPlaced = False
 
-while running:
+while running and not hasQuit:
     clickedBox = []
     for event in pygame.event.get():
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
@@ -154,9 +155,9 @@ while running:
         else:
             exitColor = continueColor = (0, 0, 0)
         if (event.type == KEYDOWN and event.key == K_ESCAPE) or event.type == QUIT:
-            pygame.quit()
+            hasQuit, running = True, False
         for c, i in enumerate(clickZones):
-            if event.type == MOUSEBUTTONUP and i.rect.collidepoint(event.pos) and i.visualObj not in {xImg, oImg}:
+            if event.type == MOUSEBUTTONUP and i.rect.collidepoint(event.pos) and i.visualObj not in {xImg, oImg} and not buttonsPlaced:
                 if count % 2 == 0:
                     clickedBox.append(c)
                     clickedBox.append(oImg)
@@ -171,11 +172,12 @@ while running:
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
         if event.type == MOUSEBUTTONUP and buttonsPlaced:
             if exitButton.collidepoint(event.pos):
-                pygame.quit()
+                hasQuit, running = True, False
             if continueButton.collidepoint(event.pos):
                 count = 1
                 newClickZones()
                 xLocs, oLocs = [], []
+                buttonsPlaced = False
 
 
     if count < 10 and not getWinner():
@@ -213,3 +215,5 @@ while running:
         buttonsPlaced = True
     
     pygame.display.flip()
+
+pygame.quit()
