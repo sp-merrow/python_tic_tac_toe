@@ -199,7 +199,7 @@ while running and not hasQuit:
         
 
     else:
-        if count == 10:
+        if not getWinner():
             endTxt = 'CATS GAME!'
         else:
             endTxt = getWinner()
